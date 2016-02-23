@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connect4", "Connect4\Connect4\Connect4.csproj", "{4571551E-E813-43DC-9EE1-D88DECA22839}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "Connect4Content", "Connect4\Connect4Content\Connect4Content.contentproj", "{234E8353-063C-4D97-8734-6E532EB5391D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4571551E-E813-43DC-9EE1-D88DECA22839}.Debug|x86.ActiveCfg = Debug|x86
+		{4571551E-E813-43DC-9EE1-D88DECA22839}.Debug|x86.Build.0 = Debug|x86
+		{4571551E-E813-43DC-9EE1-D88DECA22839}.Release|x86.ActiveCfg = Release|x86
+		{4571551E-E813-43DC-9EE1-D88DECA22839}.Release|x86.Build.0 = Release|x86
+		{234E8353-063C-4D97-8734-6E532EB5391D}.Debug|x86.ActiveCfg = Debug|x86
+		{234E8353-063C-4D97-8734-6E532EB5391D}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

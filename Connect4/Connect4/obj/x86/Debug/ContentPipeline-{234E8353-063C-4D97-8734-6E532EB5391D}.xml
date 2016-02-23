@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>Sprites\field.png</Source>
+      <Name>Sprites\field</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\field.xnb</Output>
+      <Time>2016-02-15T18:37:03.002486+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\redchip.png</Source>
+      <Name>Sprites\redchip</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\redchip.xnb</Output>
+      <Time>2016-02-15T18:39:46.3258339+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\background.jpg</Source>
+      <Name>Sprites\background</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\background.xnb</Output>
+      <Time>2016-02-15T18:32:51.6211643+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\field1.png</Source>
+      <Name>Sprites\field1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\field1.xnb</Output>
+      <Time>2016-02-14T20:50:26.5891974+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\bluechip.png</Source>
+      <Name>Sprites\bluechip</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\bluechip.xnb</Output>
+      <Time>2016-02-15T18:38:48.0607734+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\arrow.png</Source>
+      <Name>Sprites\arrow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\arrow.xnb</Output>
+      <Time>2016-02-15T18:53:05.7721188+03:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <ContentProjectGUID>{234E8353-063C-4D97-8734-6E532EB5391D}</ContentProjectGUID>
+      <TargetPlatform>Windows</TargetPlatform>
+      <TargetProfile>Reach</TargetProfile>
+      <BuildConfiguration>Debug</BuildConfiguration>
+      <CompressContent>false</CompressContent>
+      <RootDirectory>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4Content\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2011-09-01T17:22:30+04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.VideoImporters.dll</Key>
+        <Value>2011-09-01T17:22:30+04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2011-09-01T17:22:30+04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2011-09-01T17:22:30+04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2011-09-01T17:22:30+04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.AudioImporters.dll</Key>
+        <Value>2011-09-01T17:22:30+04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\WINDOWS\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2016-02-14T12:27:24.6476503+03:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>
