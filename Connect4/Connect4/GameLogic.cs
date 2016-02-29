@@ -20,14 +20,15 @@ namespace Connect4
         }
 
         private Action<int> onWon;
-        private Action<int> onDraw;
+        private Action onDraw;
+        private Action<int, int> onMove;
 
         public void AddonWonObserver(Action<int> observer)
         {
             onWon += observer;
         }
 
-        public void AddonDrawObserver(Action<int> observer)
+        public void AddonDrawObserver(Action observer)
         {
             onDraw += observer;
         }
@@ -37,9 +38,19 @@ namespace Connect4
             onWon -= observer;
         }
 
-        public void RemoveonDrawObserver(Action<int> observer)
+        public void RemoveonDrawObserver(Action observer)
         {
             onDraw -= observer;
+        }
+
+        public void AddonMoveObserver(Action<int, int> observer)
+        {
+            onMove += observer;
+        }
+         
+        public void RemoveonMoveObserver(Action<int, int> observer)
+        {
+            onMove -= observer;
         }
 
         private int[,] battleField;
@@ -53,7 +64,7 @@ namespace Connect4
         /// true, if move is done
         /// false, if the move isn't done
         /// </returns>
-        public bool MakeMove(int team, int column, ref int x, ref int y)
+        public bool MakeMove(int team, int column)
         {
             bool result = false;
             if (team == 1)
@@ -64,16 +75,16 @@ namespace Connect4
                     {
                         battleField[column, i - 1] = 1;
                         result = true;
-                        x = column;
-                        y = i;
+                        //x = column;
+                        //y = i;
                         break;
                     }
                 }
                 if (battleField[column, battleField.GetLength(1) - 1] == 0)
                 {
                     battleField[column, battleField.GetLength(1) - 1] = 1;
-                    x = column;
-                    y = battleField.GetLength(1) - 1;
+                    //x = column;
+                    //y = battleField.GetLength(1) - 1;
                     result = true;
                 }
             }
@@ -85,24 +96,36 @@ namespace Connect4
                     {
                         battleField[column, i - 1] = 2;
                         result = true;
-                        x = column;
-                        y = i;
+                        //x = column;
+                        //y = i;
                         break;
                     }
                 }
                 if (battleField[column, battleField.GetLength(1) - 1] == 0)
                 {
                     battleField[column, battleField.GetLength(1) - 1] = 2;
-                    x = column;
-                    y = battleField.GetLength(1) - 1;
+                    //x = column;
+                    //y = battleField.GetLength(1) - 1;
                     result = true;
                 }
             }
+            if (result == true)
+            {
+                if (onMove != null)
+                {
+                    onMove(team, column);
+                }
+            }
+            IsDraw();
             return result;
         }
 
-
-        public bool isWon(int color)
+        /// <summary>
+        /// Returns true if some team wons after a some move
+        /// </summary>
+        /// <param name="color">the team of the chip to add (1 or 2)</param>
+        /// <returns></returns>
+        public bool IsWon(int color)
         {
             for (int i = 0; i < battleField.GetLength(0); i++)
             {
@@ -116,11 +139,8 @@ namespace Connect4
             }
             return false;
         }
-         /// <summary>
-         /// Returns true if some team wons after a some move
-         /// </summary>
-         /// <param name="color">the team of the chip to add (1 or 2)</param>
-         /// <returns></returns>
+
+
         private bool IsWonFromCurrent(int color, int x, int y)
         {
             int n = Math.Min(battleField.GetLength(0), x + 4);
@@ -133,7 +153,7 @@ namespace Connect4
                 {
                     if (battleField[x, i] != color)
                         break;
-                    if (i == 3)
+                    if (i - y == 3)
                     {
                         onWon(color);
                         return true;
@@ -148,7 +168,7 @@ namespace Connect4
                 {
                     if (battleField[i, y] != color)
                         break;
-                    if (i == 3)
+                    if (i - x == 3)
                     { 
                         onWon(color);
                         return true;
@@ -211,9 +231,9 @@ namespace Connect4
         {
             for (int i = 0; i < battleField.GetLength(0); i++)
             {
-                if (CanMove(i)) return true;
+                if (CanMove(i)) return false;
             }
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -222,6 +242,17 @@ namespace Connect4
         public void ResetBattleFields()
         {
             battleField = new int[7, 6];
+        }
+
+        public void IsDraw()
+        {
+            if(!IsWon(1) && !IsWon(2))
+            {
+                if (IsFull())
+                {
+                    onDraw();
+                }
+            }
         }
     }
 }
