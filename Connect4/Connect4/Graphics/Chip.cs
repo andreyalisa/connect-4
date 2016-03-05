@@ -14,12 +14,6 @@ namespace Connect4.Graphics
         public Chip(Texture2D loadedTexture, ChipTeam team) : base(loadedTexture)
         {
             this.Team = team;
-            X = 0;
-            Y = 0;
         }
-
-        public int X { get; set; }
-
-        public int Y { get; set; }
     }
 }

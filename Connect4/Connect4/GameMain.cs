@@ -12,6 +12,7 @@ using Connect4.Graphics;
 
 namespace Connect4
 {
+    enum GameState { Start, Wait, Play, Won, Lose, Draw}
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -23,6 +24,10 @@ namespace Connect4
 
         GameObject mainField;
         GameObject arrow;
+
+        GpButton testButton; 
+
+
 
         Chip tempChip;
         List<Chip> chips = new List<Chip>();
@@ -40,6 +45,7 @@ namespace Connect4
         MouseState currentMouseState;
         MouseState lastMouseState;
 
+        GameState gameState = GameState.Start;
 
         public GameMain()
         {
@@ -48,7 +54,7 @@ namespace Connect4
             turn = ChipTeam.Blue;
         }
 
-        
+        GameLogic gameLogic;
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -59,7 +65,11 @@ namespace Connect4
         {
             // TODO: Add your initialization logic here
             base.Initialize();
-            this.IsMouseVisible = true;        
+            this.IsMouseVisible = true;
+            gameLogic = GameLogic.getInstance();
+            gameLogic.AddonWonObserver(Won);
+            gameLogic.AddonMoveObserver(MakeMove);
+            gameLogic.AddonDrawObserver(FinalDraw);
             //var form = (System.Windows.Forms.Form)System.Windows.Forms.Control.FromHandle(this.Window.Handle);
             //form.Location = new System.Drawing.Point(0, 0);
         }
@@ -70,12 +80,13 @@ namespace Connect4
         /// </summary>
         protected override void LoadContent()
         {
-            graphics.IsFullScreen = true;
-            graphics.PreferredBackBufferWidth = 1366;
-            graphics.PreferredBackBufferHeight = 768;
+            //graphics.IsFullScreen = true;
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
 
-
+            testButton = new GpButton(Content.Load<Texture2D>("Sprites\\btCreate"), graphics.GraphicsDevice);
+            testButton.SetPosition(new Vector2(300, 300));
             screenRectangle = new Rectangle(0, 0, graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             backgroundTexture = Content.Load<Texture2D>("Sprites\\background");
 
@@ -121,43 +132,27 @@ namespace Connect4
                 this.Exit();
             }
 
-            CheckAllChipsCollision();
             lastMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
 
-            //Arrow moving
-            var mousePosition = new Point(currentMouseState.X, currentMouseState.Y);
-            for (int i = 0; i < fieldAreas.Count(); i++)
+            switch(gameState)
             {
-                if (fieldAreas[i].Contains(mousePosition))
-                {
-                    arrow.Position = new Vector2(mainField.Position.X + 15 + tempChip.Sprite.Width * i, mainField.Position.Y - arrow.Sprite.Height - 2);
-                    arrowIndex = i;
+                case GameState.Start:
+                    UpdateOnGameStateStart(gameTime);
                     break;
-                } 
+                case GameState.Won:
+                    UpdateOnGameStateWon(gameTime);
+                    break;
+                default:
+                    UpdateOnGameStatePlay(gameTime);
+                    break;
             }
-
-            // Recognize a single click of the left mouse button
-            if (lastMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
-            {
-                if (turn == ChipTeam.Blue)
-                {
-                    MakeMove(turn, arrowIndex);
-                } else if (turn == ChipTeam.Red)
-                {
-                    MakeMove(turn, arrowIndex);
-                }
-            }
-
-            foreach (var chip in chips)
-            {
-                chip.Position += chip.Velocity;
-            }
-
-            // TODO: Add your update logic here
 
             base.Update(gameTime);
+
         }
+
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -167,18 +162,19 @@ namespace Connect4
         {
             GraphicsDevice.Clear(Color.LightSlateGray);
 
-            // TODO: Add your drawing code here
             spriteBatch.Begin();
-            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
-            //spriteBatch.Draw(tempChip.Sprite, tempChip.Position, Color.White);
-            DrawGameObject(arrow);
 
-            foreach (var chip in chips)
+            switch(gameState)
             {
-                DrawGameObject(chip);
+                case GameState.Start:
+                    DrawOnGameStateStart(gameTime);
+                    break;
+                default:
+                    DrawOnGameStatePlay(gameTime);
+                    break;
+
             }
 
-            DrawGameObject(mainField);
             spriteBatch.End();
             base.Draw(gameTime);
         }
@@ -202,25 +198,24 @@ namespace Connect4
             fieldAreas[6] = new Rectangle(fieldAreas[5].Right, 0, graphics.GraphicsDevice.Viewport.Width - fieldAreas[5].Right, graphics.GraphicsDevice.Viewport.Height);
         }
 
-        private void MakeMove(ChipTeam team, int moveIndex)
+        private void MakeMove(int team, int moveIndex)
         {
-            if (team == ChipTeam.Blue)
+            if (team == 1)
             {
-                Chip movingChip = new Chip(Content.Load<Texture2D>("Sprites\\bluechip"), team);
+                Chip movingChip = new Chip(Content.Load<Texture2D>("Sprites\\bluechip"), ChipTeam.Blue);
                 movingChip.Position = new Vector2(mainField.Position.X + 1 + (tempChip.Sprite.Width) * moveIndex, mainField.Position.Y - tempChip.Sprite.Height - 2);
                 movingChip.Velocity = new Vector2(0, SPEED);
                 chips.Add(movingChip);
                 turn = ChipTeam.Red;                
             }
-            else if (team == ChipTeam.Red)
+            else if (team == 2)
             {
                 turn = ChipTeam.Blue;
-                Chip movingChip = new Chip(Content.Load<Texture2D>("Sprites\\redchip"), team);
+                Chip movingChip = new Chip(Content.Load<Texture2D>("Sprites\\redchip"), ChipTeam.Red);
                 movingChip.Position = new Vector2(mainField.Position.X + 1 + (tempChip.Sprite.Width) * moveIndex, mainField.Position.Y - tempChip.Sprite.Height - 2);
                 movingChip.Velocity = new Vector2(0, SPEED);
                 chips.Add(movingChip);
-            }
-            MakeMoveInArray(team, moveIndex); 
+            } 
         }
 
         private void MakeMoveInArray(ChipTeam team, int moveIndex)
@@ -284,6 +279,102 @@ namespace Connect4
             }
         }
 
-        
+        private void Won(int color)
+        {
+            gameState = GameState.Won;    
+            Console.WriteLine(color);
+          //  this.Exit();
+        }
+
+        private void FinalDraw()
+        {
+            Console.WriteLine("Draw");
+        }
+
+        private bool IsMovesDone()
+        {
+            foreach (var item in chips)
+            {
+                if (!item.Velocity.Equals(Vector2.Zero))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void UpdateOnGameStatePlay(GameTime gameTime)
+        {
+            CheckAllChipsCollision();
+            //Arrow moving
+            var mousePosition = new Point(currentMouseState.X, currentMouseState.Y);
+            for (int i = 0; i < fieldAreas.Count(); i++)
+            {
+                if (fieldAreas[i].Contains(mousePosition))
+                {
+                    arrow.Position = new Vector2(mainField.Position.X + 15 + tempChip.Sprite.Width * i, mainField.Position.Y - arrow.Sprite.Height - 2);
+                    arrowIndex = i;
+                    break;
+                }
+            }
+
+            // Recognize a single click of the left mouse button
+            if (lastMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (turn == ChipTeam.Blue)
+                {
+                    gameLogic.MakeMove(1, arrowIndex);
+                }
+                else if (turn == ChipTeam.Red)
+                {
+                    gameLogic.MakeMove(2, arrowIndex);
+                }
+            }
+
+            foreach (var chip in chips)
+            {
+                chip.Position += chip.Velocity;
+            }
+        }
+
+        private void UpdateOnGameStateWon(GameTime gameTime)
+        {
+            UpdateOnGameStatePlay(gameTime);
+            if (IsMovesDone())
+            {
+                this.Exit();
+            }
+        }
+
+        private void UpdateOnGameStateStart(GameTime gameTime)
+        {
+           
+            testButton.Update(Mouse.GetState());
+            if (testButton.IsClicked)
+            {
+                gameState = GameState.Play;
+            }
+        }
+
+        private void DrawOnGameStateStart(GameTime gameTime)
+        {
+            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
+            testButton.Draw(spriteBatch);
+        }
+
+        private void DrawOnGameStatePlay(GameTime gameTime)
+        {
+            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
+            //spriteBatch.Draw(tempChip.Sprite, tempChip.Position, Color.White);
+            DrawGameObject(arrow);
+
+            foreach (var chip in chips)
+            {
+                DrawGameObject(chip);
+            }
+
+            DrawGameObject(mainField);
+        }
+
     }
 }

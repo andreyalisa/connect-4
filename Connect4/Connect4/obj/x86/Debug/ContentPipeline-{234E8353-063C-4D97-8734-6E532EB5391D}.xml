@@ -55,6 +55,24 @@
       <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\arrow.xnb</Output>
       <Time>2016-02-15T18:53:05.7721188+03:00</Time>
     </Item>
+    <Item>
+      <Source>Sprites\btConnect.png</Source>
+      <Name>Sprites\btConnect</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btConnect.xnb</Output>
+      <Time>2016-03-05T17:02:44.7067425+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\btCreate.png</Source>
+      <Name>Sprites\btCreate</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btCreate.xnb</Output>
+      <Time>2016-03-05T17:02:10.5555151+03:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <ContentProjectGUID>{234E8353-063C-4D97-8734-6E532EB5391D}</ContentProjectGUID>
