@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Connect4.Graphics;
+using System.Threading;
 
 namespace Connect4
 {
@@ -16,18 +17,26 @@ namespace Connect4
     /// <summary>
     /// This is the main type for your game
     /// </summary>
+    /// 
     public class GameMain : Microsoft.Xna.Framework.Game
     {
+
+        List<GpItem> controls = new List<GpItem>();
         const int SPEED = 10;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        SpriteFont font;
         GameObject mainField;
         GameObject arrow;
 
-        GpButton testButton; 
-
-
+        //Start state
+        GpButton createButton;
+        GpButton connectButton;
+        GpTextBox ipTextBox;
+        GpTextBox portTextBox;
+        GpLabel ipLabel;
+        GpLabel portLabel;
+        GpLabel errorLabel;
 
         Chip tempChip;
         List<Chip> chips = new List<Chip>();
@@ -37,13 +46,16 @@ namespace Connect4
         Texture2D backgroundTexture;
         ChipTeam turn;
         Rectangle[] fieldAreas;
-        int[,] battleField = new int[7, 6];  //0 - empty; 1 - blue; 2 - red;
 
         int arrowIndex;
 
         //Mouse states
         MouseState currentMouseState;
         MouseState lastMouseState;
+
+        //Keyboard states
+        KeyboardState currentKeyBoardState;
+        KeyboardState lastKeyBoardState;
 
         GameState gameState = GameState.Start;
 
@@ -61,15 +73,19 @@ namespace Connect4
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
+
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
             base.Initialize();
             this.IsMouseVisible = true;
+            lastMouseState = new MouseState();
+            lastKeyBoardState = Keyboard.GetState();
             gameLogic = GameLogic.getInstance();
             gameLogic.AddonWonObserver(Won);
             gameLogic.AddonMoveObserver(MakeMove);
             gameLogic.AddonDrawObserver(FinalDraw);
+
             //var form = (System.Windows.Forms.Form)System.Windows.Forms.Control.FromHandle(this.Window.Handle);
             //form.Location = new System.Drawing.Point(0, 0);
         }
@@ -85,8 +101,10 @@ namespace Connect4
             graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
 
-            testButton = new GpButton(Content.Load<Texture2D>("Sprites\\btCreate"), graphics.GraphicsDevice);
-            testButton.SetPosition(new Vector2(300, 300));
+            font = Content.Load<SpriteFont>("Fonts\\baseFont");
+
+            LoadControls();
+            onStartStateStart();
             screenRectangle = new Rectangle(0, 0, graphics.GraphicsDevice.Viewport.Width, graphics.GraphicsDevice.Viewport.Height);
             backgroundTexture = Content.Load<Texture2D>("Sprites\\background");
 
@@ -109,6 +127,26 @@ namespace Connect4
 
         }
 
+        private void LoadControls()
+        {
+            createButton = new GpButton(Content.Load<Texture2D>("Sprites\\btCreate"), graphics.GraphicsDevice);
+            createButton.SetPosition(new Vector2(20, 200));
+            createButton.onClick += buttonCreateClick;
+
+            connectButton = new GpButton(Content.Load<Texture2D>("Sprites\\btConnect"), graphics.GraphicsDevice);
+            connectButton.SetPosition(new Vector2(20, 330));
+            connectButton.onClick += buttonConnectClick;
+            ipTextBox = new GpTextBox(Content.Load<Texture2D>("Sprites\\textBoxGray"), new Vector2(20, 260), font);
+            portTextBox = new GpTextBox(Content.Load<Texture2D>("Sprites\\textBoxGray"), new Vector2(20, 300), font);
+
+            ipLabel = new GpLabel(new Vector2(20, 240), font, "IP TO CONNECT");
+            portLabel = new GpLabel(new Vector2(20, 280), font, "PORT TO CONNECT");
+            errorLabel = new GpLabel(new Vector2(20, 360), font, "Connection error, try again.");
+            errorLabel.TextColor = Color.Red;
+            errorLabel.IsVisible = false;
+        }
+
+       
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
@@ -124,18 +162,25 @@ namespace Connect4
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
-        {
-            // Allows the game to exit
-            var kb = Keyboard.GetState();
-            if (kb.IsKeyDown(Keys.Escape))
-            {
-                this.Exit();
-            }
+        {            
 
             lastMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
 
-            switch(gameState)
+            lastKeyBoardState = currentKeyBoardState;
+            currentKeyBoardState = Keyboard.GetState();
+
+            if (currentKeyBoardState.IsKeyDown(Keys.D0))
+            {
+                Console.WriteLine(Keys.D0.ToString());
+            }
+            // Allows the game to exit
+            if (currentKeyBoardState.IsKeyDown(Keys.Escape))
+            {
+                this.Exit();
+            }
+
+            switch (gameState)
             {
                 case GameState.Start:
                     UpdateOnGameStateStart(gameTime);
@@ -148,6 +193,7 @@ namespace Connect4
                     break;
             }
 
+            UpdateControls(gameTime);
             base.Update(gameTime);
 
         }
@@ -163,8 +209,9 @@ namespace Connect4
             GraphicsDevice.Clear(Color.LightSlateGray);
 
             spriteBatch.Begin();
+        
 
-            switch(gameState)
+            switch (gameState)
             {
                 case GameState.Start:
                     DrawOnGameStateStart(gameTime);
@@ -174,7 +221,7 @@ namespace Connect4
                     break;
 
             }
-
+            DrawControls(gameTime);
             spriteBatch.End();
             base.Draw(gameTime);
         }
@@ -218,38 +265,6 @@ namespace Connect4
             } 
         }
 
-        private void MakeMoveInArray(ChipTeam team, int moveIndex)
-        {
-            if (team == ChipTeam.Blue)
-            {
-                for (int i = 1; i < battleField.GetLength(1); i++)
-                {
-                    if (battleField[moveIndex, i] > 0)
-                    {
-                        battleField[moveIndex, i - 1] = 1;
-                        break;
-                    }
-                }
-                if (battleField[moveIndex, battleField.GetLength(1) - 1] == 0)
-                {
-                    battleField[moveIndex, battleField.GetLength(1) - 1] = 1;
-                }
-            } else if (team == ChipTeam.Red)
-            {
-                for (int i = 1; i < battleField.GetLength(1); i++)
-                {
-                    if (battleField[moveIndex, i] > 0)
-                    {
-                        battleField[moveIndex, i - 1] = 2;
-                        break;
-                    }
-                }
-                if (battleField[moveIndex, battleField.GetLength(1) - 1] == 0)
-                {
-                    battleField[moveIndex, battleField.GetLength(1) - 1] = 2;
-                }
-            }
-        }
 
         private void CheckAllChipsCollision()
         {
@@ -347,19 +362,13 @@ namespace Connect4
         }
 
         private void UpdateOnGameStateStart(GameTime gameTime)
-        {
-           
-            testButton.Update(Mouse.GetState());
-            if (testButton.IsClicked)
-            {
-                gameState = GameState.Play;
-            }
+        {          
+
         }
 
         private void DrawOnGameStateStart(GameTime gameTime)
         {
             spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
-            testButton.Draw(spriteBatch);
         }
 
         private void DrawOnGameStatePlay(GameTime gameTime)
@@ -374,6 +383,60 @@ namespace Connect4
             }
 
             DrawGameObject(mainField);
+        }
+
+        private void DrawControls(GameTime gameTime)
+        {
+            foreach (var item in controls)
+            {
+                item.Draw(spriteBatch);
+            }
+        }
+
+        private void UpdateControls(GameTime gameTime)
+        {
+            try {
+                foreach (var item in controls)
+                {
+                    item.Update(lastMouseState, currentMouseState, lastKeyBoardState, currentKeyBoardState);
+                }
+            }catch { }
+        }
+
+        private void onStartStateStart()
+        {
+            controls.Add(connectButton);
+            controls.Add(createButton);
+            controls.Add(ipTextBox);
+            controls.Add(portTextBox);
+            controls.Add(ipLabel);
+            controls.Add(portLabel);
+            controls.Add(errorLabel);
+        }
+
+        private void onPlayStateStart()
+        {
+            controls.Clear();
+        }
+
+        private void buttonCreateClick()
+        {
+            gameState = GameState.Play;
+            onPlayStateStart();
+        }
+
+        private void buttonConnectClick()
+        {
+            errorLabel.IsVisible = false;
+            Thread workerThread = new Thread(Test);
+            workerThread.Start();
+
+        }
+
+        private void Test()
+        {
+            Thread.Sleep(3000);
+            errorLabel.IsVisible = true;
         }
 
     }

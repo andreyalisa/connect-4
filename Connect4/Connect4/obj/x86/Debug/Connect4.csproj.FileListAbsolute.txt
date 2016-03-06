@@ -22,3 +22,7 @@ C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connec
 C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\arrow.xnb
 C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btConnect.xnb
 C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btCreate.xnb
+C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btExit.xnb
+C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btOK.xnb
+C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Fonts\baseFont.xnb
+C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\textBoxGray.xnb

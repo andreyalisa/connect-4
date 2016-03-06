@@ -75,9 +75,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameLogic.cs" />
+    <Compile Include="Graphics\GpLabel.cs" />
+    <Compile Include="Graphics\GpItem.cs" />
     <Compile Include="Graphics\GpButton.cs" />
     <Compile Include="Graphics\Chip.cs" />
     <Compile Include="Graphics\GameObject.cs" />
+    <Compile Include="Graphics\GpTextBox.cs" />
     <Compile Include="Network\Server.cs" />
     <Compile Include="Network\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

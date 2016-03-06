@@ -6,3 +6,7 @@ Content\Sprites\bluechip.xnb
 Content\Sprites\arrow.xnb
 Content\Sprites\btConnect.xnb
 Content\Sprites\btCreate.xnb
+Content\Sprites\btExit.xnb
+Content\Sprites\btOK.xnb
+Content\Fonts\baseFont.xnb
+Content\Sprites\textBoxGray.xnb

@@ -73,6 +73,42 @@
       <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btCreate.xnb</Output>
       <Time>2016-03-05T17:02:10.5555151+03:00</Time>
     </Item>
+    <Item>
+      <Source>Sprites\btExit.png</Source>
+      <Name>Sprites\btExit</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btExit.xnb</Output>
+      <Time>2016-03-05T17:45:01.0673489+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\btOK.png</Source>
+      <Name>Sprites\btOK</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btOK.xnb</Output>
+      <Time>2016-03-05T17:45:35.1296081+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Fonts\baseFont.spritefont</Source>
+      <Name>Fonts\baseFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Fonts\baseFont.xnb</Output>
+      <Time>2016-03-06T14:11:35.1082537+03:00</Time>
+    </Item>
+    <Item>
+      <Source>Sprites\textBoxGray.jpg</Source>
+      <Name>Sprites\textBoxGray</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\textBoxGray.xnb</Output>
+      <Time>2016-03-06T14:51:28.8518211+03:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <ContentProjectGUID>{234E8353-063C-4D97-8734-6E532EB5391D}</ContentProjectGUID>

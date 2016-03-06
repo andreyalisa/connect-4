@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Connect4.Graphics
 {
-    public class GpButton
+    public class GpButton : GpItem
     {
         Rectangle rectangle;
         Color color = new Color(255, 255, 255);
@@ -29,7 +29,7 @@ namespace Connect4.Graphics
         bool down;
 
         public bool IsClicked { get; set; }
-        public void Update(MouseState state)
+        public void Update(MouseState laststateMouse, MouseState state, KeyboardState laststate, KeyboardState currentstate)
         {
             rectangle = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
 
@@ -40,7 +40,11 @@ namespace Connect4.Graphics
                 if (color.A < 150) down = true;
                 if (down) color.A += 3;
                 else color.A -= 3;
-                if (state.LeftButton == ButtonState.Pressed) IsClicked = true;
+                if (state.LeftButton == ButtonState.Pressed && laststateMouse.LeftButton == ButtonState.Released)
+                {
+                    IsClicked = true;
+                    onClick();
+                }
             } else if (color.A < 255)
             {
                 color.A += 3;
@@ -57,6 +61,8 @@ namespace Connect4.Graphics
         {
             spriteBatch.Draw(texture, rectangle, color);
         }
+
+        public Action onClick;
 
        
     }
