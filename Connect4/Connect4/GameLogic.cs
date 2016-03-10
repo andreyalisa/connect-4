@@ -64,9 +64,10 @@ namespace Connect4
         /// true, if move is done
         /// false, if the move isn't done
         /// </returns>
-        public bool MakeMove(int team, int column)
+        public void MakeMove(int team, int column)
         {
             bool result = false;
+            if (!CanMove(column)) return;
             if (team == 1)
             {
                 for (int i = 1; i < battleField.GetLength(1); i++)
@@ -117,7 +118,7 @@ namespace Connect4
                 }
             }
             IsDraw();
-            return result;
+            return;
         }
 
         /// <summary>
@@ -239,6 +240,16 @@ namespace Connect4
         /// <summary>
         /// Resets the battle fields
         /// </summary>
+        /// 
+
+        public void Reset()
+        {
+            ResetBattleFields();
+            onWon = null;
+            onDraw = null;
+            onMove = null;
+        }
+
         public void ResetBattleFields()
         {
             battleField = new int[7, 6];
@@ -250,6 +261,7 @@ namespace Connect4
             {
                 if (IsFull())
                 {
+                    if (onDraw != null)
                     onDraw();
                 }
             }

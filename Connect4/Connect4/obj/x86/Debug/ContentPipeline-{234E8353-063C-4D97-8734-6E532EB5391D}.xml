@@ -109,6 +109,15 @@
       <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\textBoxGray.xnb</Output>
       <Time>2016-03-06T14:51:28.8518211+03:00</Time>
     </Item>
+    <Item>
+      <Source>Sprites\btMenu.png</Source>
+      <Name>Sprites\btMenu</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Marikyan\documents\visual studio 2015\Projects\Connect4\Connect4\Connect4\bin\x86\Debug\Content\Sprites\btMenu.xnb</Output>
+      <Time>2016-03-07T13:12:08.1168435+03:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <ContentProjectGUID>{234E8353-063C-4D97-8734-6E532EB5391D}</ContentProjectGUID>
