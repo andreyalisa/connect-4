@@ -10,6 +10,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Connect4.Graphics;
 using System.Threading;
+using Connect4.Network;
+using System.Threading.Tasks;
 
 namespace Connect4
 {
@@ -32,19 +34,31 @@ namespace Connect4
         //Start state
         GpButton createButton;
         GpButton connectButton;
+        GpButton exitButton;
         GpTextBox ipTextBox;
         GpTextBox portTextBox;
         GpLabel ipLabel;
         GpLabel portLabel;
         GpLabel errorLabel;
 
+
+        //Wait state
+        GpLabel messageLabel;
+        GpButton menuButton;
+        GpLabel currentIPLabel;
+        GpLabel currentPortLabel;
+
+
+        //Play state
         Chip tempChip;
         List<Chip> chips = new List<Chip>();
+        GpLabel turnLable;
 
         Rectangle screenRectangle;
         Rectangle bottomRectangle;
         Texture2D backgroundTexture;
         ChipTeam turn;
+        ChipTeam playerTeam;
         Rectangle[] fieldAreas;
 
         int arrowIndex;
@@ -67,6 +81,7 @@ namespace Connect4
         }
 
         GameLogic gameLogic;
+        Server server;
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -96,7 +111,7 @@ namespace Connect4
         /// </summary>
         protected override void LoadContent()
         {
-            //graphics.IsFullScreen = true;
+           // graphics.IsFullScreen = true;
             graphics.PreferredBackBufferWidth = 800;
             graphics.PreferredBackBufferHeight = 600;
             graphics.ApplyChanges();
@@ -109,7 +124,7 @@ namespace Connect4
             backgroundTexture = Content.Load<Texture2D>("Sprites\\background");
 
             mainField = new GameObject(Content.Load<Texture2D>("Sprites\\field"));
-            mainField.Position = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - mainField.Center.X, 
+            mainField.Position = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2 - mainField.Center.X,
                                              graphics.GraphicsDevice.Viewport.Height - mainField.Sprite.Height - 10);
 
 
@@ -119,7 +134,7 @@ namespace Connect4
             bottomRectangle = new Rectangle((int)mainField.Position.X, (int)mainField.Position.Y + mainField.Sprite.Height - GameObject.DELTA - 2, mainField.Sprite.Width, 1);
 
             arrow = new GameObject(Content.Load<Texture2D>("Sprites\\arrow"));
-            arrow.Position = new Vector2(mainField.Position.X + 15 + tempChip.Sprite.Width*6, mainField.Position.Y - arrow.Sprite.Height - 2);
+            arrow.Position = new Vector2(mainField.Position.X + 15 + tempChip.Sprite.Width * 6, mainField.Position.Y - arrow.Sprite.Height - 2);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             SetFieldAreas();
 
@@ -136,17 +151,37 @@ namespace Connect4
             connectButton = new GpButton(Content.Load<Texture2D>("Sprites\\btConnect"), graphics.GraphicsDevice);
             connectButton.SetPosition(new Vector2(20, 330));
             connectButton.onClick += buttonConnectClick;
+
+            exitButton = new GpButton(Content.Load<Texture2D>("Sprites\\btExit"), graphics.GraphicsDevice);
+            exitButton.SetPosition(new Vector2(20, 360));
+            exitButton.onClick += buttonExitClick;
+
             ipTextBox = new GpTextBox(Content.Load<Texture2D>("Sprites\\textBoxGray"), new Vector2(20, 260), font);
+
             portTextBox = new GpTextBox(Content.Load<Texture2D>("Sprites\\textBoxGray"), new Vector2(20, 300), font);
 
             ipLabel = new GpLabel(new Vector2(20, 240), font, "IP TO CONNECT");
+
             portLabel = new GpLabel(new Vector2(20, 280), font, "PORT TO CONNECT");
-            errorLabel = new GpLabel(new Vector2(20, 360), font, "Connection error, try again.");
+
+            errorLabel = new GpLabel(new Vector2(20, 390), font, "Connection error, try again.");
             errorLabel.TextColor = Color.Red;
             errorLabel.IsVisible = false;
+
+            messageLabel = new GpLabel(new Vector2(50, 50), font);
+            menuButton = new GpButton(Content.Load<Texture2D>("Sprites\\btMenu"), graphics.GraphicsDevice);
+            menuButton.SetPosition(new Vector2(10, 10));
+            menuButton.onClick += buttonMenuClick;
+
+            currentIPLabel = new GpLabel(new Vector2(400, 50), font);
+            currentPortLabel = new GpLabel(new Vector2(400, 80), font);
+
+            turnLable = new GpLabel(new Vector2(100, 50), font);
+            turnLable.TextColor = Color.DarkRed;
+
         }
 
-       
+
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
@@ -154,6 +189,7 @@ namespace Connect4
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            if (server != null) { server.Abort(); }
         }
 
         /// <summary>
@@ -162,7 +198,7 @@ namespace Connect4
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
-        {            
+        {
 
             lastMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
@@ -170,10 +206,6 @@ namespace Connect4
             lastKeyBoardState = currentKeyBoardState;
             currentKeyBoardState = Keyboard.GetState();
 
-            if (currentKeyBoardState.IsKeyDown(Keys.D0))
-            {
-                Console.WriteLine(Keys.D0.ToString());
-            }
             // Allows the game to exit
             if (currentKeyBoardState.IsKeyDown(Keys.Escape))
             {
@@ -188,8 +220,17 @@ namespace Connect4
                 case GameState.Won:
                     UpdateOnGameStateWon(gameTime);
                     break;
-                default:
+                case GameState.Play:
                     UpdateOnGameStatePlay(gameTime);
+                    break;
+                case GameState.Wait:
+                    UpdateOnGameStateWait(gameTime);
+                    break;
+                case GameState.Lose:
+                    UpdateOnGameStateLose(gameTime);
+                    break;
+                case GameState.Draw:
+                    UpdateOnGameStateDraw(gameTime);
                     break;
             }
 
@@ -209,17 +250,28 @@ namespace Connect4
             GraphicsDevice.Clear(Color.LightSlateGray);
 
             spriteBatch.Begin();
-        
+
 
             switch (gameState)
             {
                 case GameState.Start:
                     DrawOnGameStateStart(gameTime);
                     break;
-                default:
+                case GameState.Wait:
+                    DrawOnGameStateWait(gameTime);
+                    break;
+                case GameState.Draw:
+                    DrawOnGameStateDraw(gameTime);
+                    break;
+                case GameState.Lose:
+                    DrawOnGameStateLose(gameTime);
+                    break;
+                case GameState.Won:
+                    DrawOnGameStateWon(gameTime);
+                    break;
+                case GameState.Play:
                     DrawOnGameStatePlay(gameTime);
                     break;
-
             }
             DrawControls(gameTime);
             spriteBatch.End();
@@ -251,9 +303,9 @@ namespace Connect4
             {
                 Chip movingChip = new Chip(Content.Load<Texture2D>("Sprites\\bluechip"), ChipTeam.Blue);
                 movingChip.Position = new Vector2(mainField.Position.X + 1 + (tempChip.Sprite.Width) * moveIndex, mainField.Position.Y - tempChip.Sprite.Height - 2);
-                movingChip.Velocity = new Vector2(0, SPEED);
+                movingChip.Velocity = new Vector2(0, SPEED); 
                 chips.Add(movingChip);
-                turn = ChipTeam.Red;                
+                turn = ChipTeam.Red;
             }
             else if (team == 2)
             {
@@ -262,9 +314,8 @@ namespace Connect4
                 movingChip.Position = new Vector2(mainField.Position.X + 1 + (tempChip.Sprite.Width) * moveIndex, mainField.Position.Y - tempChip.Sprite.Height - 2);
                 movingChip.Velocity = new Vector2(0, SPEED);
                 chips.Add(movingChip);
-            } 
+            }
         }
-
 
         private void CheckAllChipsCollision()
         {
@@ -296,14 +347,25 @@ namespace Connect4
 
         private void Won(int color)
         {
-            gameState = GameState.Won;    
-            Console.WriteLine(color);
-          //  this.Exit();
+            if ((int)playerTeam == color - 1)
+            {
+                //Wine
+                turnLable.Content = "You win)))";
+                gameState = GameState.Won;
+              
+            } else
+            {
+                //Lose
+                turnLable.Content = "You lose(((";
+                gameState = GameState.Lose;
+            }
+
         }
 
         private void FinalDraw()
         {
-            Console.WriteLine("Draw");
+            turnLable.Content = "DRAW!";
+            gameState = GameState.Draw;
         }
 
         private bool IsMovesDone()
@@ -318,9 +380,12 @@ namespace Connect4
             return true;
         }
 
+
+        //Updates
         private void UpdateOnGameStatePlay(GameTime gameTime)
         {
             CheckAllChipsCollision();
+            arrowIndex = -1;
             //Arrow moving
             var mousePosition = new Point(currentMouseState.X, currentMouseState.Y);
             for (int i = 0; i < fieldAreas.Count(); i++)
@@ -333,17 +398,26 @@ namespace Connect4
                 }
             }
 
-            // Recognize a single click of the left mouse button
-            if (lastMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed)
+            if (turn == playerTeam)
             {
-                if (turn == ChipTeam.Blue)
+                turnLable.Content = "Your turn";
+                // Recognize a single click of the left mouse button
+                if (lastMouseState.LeftButton == ButtonState.Released && currentMouseState.LeftButton == ButtonState.Pressed && arrowIndex >= 0)
                 {
-                    gameLogic.MakeMove(1, arrowIndex);
+                    if (turn == ChipTeam.Blue)
+                    {
+                        server.SendMove(1, arrowIndex);
+                        gameLogic.MakeMove(1, arrowIndex);
+                    }
+                    else if (turn == ChipTeam.Red)
+                    {
+                        server.SendMove(2, arrowIndex);
+                        gameLogic.MakeMove(2, arrowIndex);
+                    }
                 }
-                else if (turn == ChipTeam.Red)
-                {
-                    gameLogic.MakeMove(2, arrowIndex);
-                }
+            } else
+            {
+                turnLable.Content = "Opponent's turn";
             }
 
             foreach (var chip in chips)
@@ -353,19 +427,53 @@ namespace Connect4
         }
 
         private void UpdateOnGameStateWon(GameTime gameTime)
-        {
-            UpdateOnGameStatePlay(gameTime);
-            if (IsMovesDone())
+        {            
+            if (!IsMovesDone())
             {
-                this.Exit();
+                CheckAllChipsCollision();
+                foreach (var chip in chips)
+                {
+                    chip.Position += chip.Velocity;
+                }
             }
         }
 
         private void UpdateOnGameStateStart(GameTime gameTime)
-        {          
+        {
 
         }
 
+        private void UpdateOnGameStateWait(GameTime gameTime)
+        {
+
+        }
+
+        private void UpdateOnGameStateLose(GameTime gameTime)
+        {
+            if (!IsMovesDone())
+            {
+                CheckAllChipsCollision();
+                foreach (var chip in chips)
+                {
+                    chip.Position += chip.Velocity;
+                }
+            }
+        }
+
+        private void UpdateOnGameStateDraw(GameTime gameTime)
+        {
+            if (!IsMovesDone())
+            {
+                CheckAllChipsCollision();
+                foreach (var chip in chips)
+                {
+                    chip.Position += chip.Velocity;
+                }
+            }
+        }
+
+
+        //Draws
         private void DrawOnGameStateStart(GameTime gameTime)
         {
             spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
@@ -385,6 +493,50 @@ namespace Connect4
             DrawGameObject(mainField);
         }
 
+        private void DrawOnGameStateWait(GameTime gameTime)
+        {
+            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
+            DrawGameObject(mainField);
+        }
+
+        private void DrawOnGameStateWon(GameTime gameTime)
+        {
+            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
+            foreach (var chip in chips)
+            {
+                DrawGameObject(chip);
+            }
+
+            DrawGameObject(mainField);
+        }
+
+        private void DrawOnGameStateLose(GameTime gameTime)
+        {
+            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
+            foreach (var chip in chips)
+            {
+                DrawGameObject(chip);
+            }
+
+            DrawGameObject(mainField);
+        }
+
+
+        private void DrawOnGameStateDraw(GameTime gameTime)
+        {
+            spriteBatch.Draw(backgroundTexture, screenRectangle, Color.White);
+            foreach (var chip in chips)
+            {
+                DrawGameObject(chip);
+            }
+
+            DrawGameObject(mainField);
+        }
+
+
+
+
+
         private void DrawControls(GameTime gameTime)
         {
             foreach (var item in controls)
@@ -400,11 +552,13 @@ namespace Connect4
                 {
                     item.Update(lastMouseState, currentMouseState, lastKeyBoardState, currentKeyBoardState);
                 }
-            }catch { }
+            } catch { }
         }
 
         private void onStartStateStart()
         {
+            gameState = GameState.Start;
+            controls.Clear();
             controls.Add(connectButton);
             controls.Add(createButton);
             controls.Add(ipTextBox);
@@ -412,31 +566,93 @@ namespace Connect4
             controls.Add(ipLabel);
             controls.Add(portLabel);
             controls.Add(errorLabel);
+            controls.Add(exitButton);
         }
 
         private void onPlayStateStart()
         {
+            gameState = GameState.Play;
             controls.Clear();
+            controls.Add(turnLable);
+            controls.Add(menuButton);
+        }
+
+        private void onWaitStateStart()
+        {
+            gameState = GameState.Wait;
+            controls.Clear();
+            messageLabel.Content = "Waiting for other player";
+            messageLabel.TextColor = Color.DarkSlateGray;
+            controls.Add(messageLabel);
+            controls.Add(menuButton);
+            controls.Add(currentIPLabel);
+            controls.Add(currentPortLabel);
         }
 
         private void buttonCreateClick()
         {
-            gameState = GameState.Play;
-            onPlayStateStart();
+            onWaitStateStart();
+            server = Server.getInstance();
+            int i = 0;
+            while (i < 20)
+            {
+                i++;
+                Thread.Sleep(100);
+                if (server.IsServerCreated()) break;
+            }
+            if (server.IsServerCreated())
+            {
+                currentIPLabel.Content = "IP: " + server.getServerUser().IP;
+                currentPortLabel.Content = "Port: " + server.getServerUser().Port.ToString();
+                server.onUserConnected += onPlayStateStart;
+                playerTeam = ChipTeam.Blue;
+                server.onCantConnect += connectionError;
+                server.onMakeMove += gameLogic.MakeMove;
+            } else
+            {
+                errorLabel.Content = "Oups, can't create a game, check your network settings.";
+                onStartStateStart();
+            }
         }
 
         private void buttonConnectClick()
         {
-            errorLabel.IsVisible = false;
-            Thread workerThread = new Thread(Test);
-            workerThread.Start();
-
+            onWaitStateStart();
+            server = Server.getInstance();
+            int i = 0;
+            while (i < 20)
+            {
+                i++;
+                Thread.Sleep(100);
+                if (server.IsServerCreated()) break;
+            }
+            playerTeam = ChipTeam.Red;
+            server.onCantConnect += connectionError;
+            server.onConnected += onPlayStateStart;
+            server.onMakeMove += gameLogic.MakeMove;
+            server.Connect(ipTextBox.GetContent(), portTextBox.GetContent());
         }
 
-        private void Test()
+        private void connectionError()
         {
-            Thread.Sleep(3000);
+            errorLabel.Content = "Connection error.";
             errorLabel.IsVisible = true;
+            buttonMenuClick();
+        }
+        private void buttonMenuClick()
+        {
+            if (server != null)
+            {
+                server.Abort();
+            }
+            gameLogic.ResetBattleFields();
+            onStartStateStart();
+            chips.Clear();
+        }
+
+        private void buttonExitClick()
+        {
+            this.Exit();
         }
 
     }
