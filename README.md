@@ -4,5 +4,4 @@ Connect Four (also known as Captain's Mistress, Four Up, Plot Four, Find Four, F
 
 The game was first sold under the famous Connect Four trademark by Milton Bradley in February 1974.
 --
-Here are the version of this game for pc.
-kek
+Here are the version of this game for pc by local network.
